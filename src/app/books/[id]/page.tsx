@@ -1,170 +1,126 @@
+// src/app/books/[id]/page.tsx
 import { repo } from "@/lib/repo";
+import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, BookOpen, Clock, Hash, NotebookPen, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { DeleteBookDialog } from "@/components/DeleteBookDialog";
-import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
-export default async function BookDetailPage({
-    params,
-}: {
-    params: { id: string };
-}) {
-    const book = await repo.getBook(params.id);
+interface BookDetailsPageProps {
+  params: { id: string };
+}
 
-    if (!book) {
-        notFound();
-    }
+const statusStyles: Record<string, string> = {
+  LENDO: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  LIDO: "bg-green-500/20 text-green-300 border-green-500/30",
+  PAUSADO: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+  ABANDONADO: "bg-red-500/20 text-red-300 border-red-500/30",
+  QUERO_LER: "bg-gray-500/20 text-gray-300 border-gray-500/30",
+};
 
-    const { id, title, author, cover, year, pages, currentPage, rating, synopsis, isbn, notes, status, genre } = book;
+export default async function BookDetailsPage({ params }: BookDetailsPageProps) {
+  // Desestruturação imediata para evitar o warning
+  const { id } = params;
+  const book = await repo.getBook(id);
+  
+  if (!book) notFound();
 
-    const progress = pages && currentPage ? Math.round((currentPage / pages) * 100) : 0;
-    const isCompleted = status === 'LIDO';
+  const progress =
+    book.pages && book.currentPage
+      ? Math.round((book.currentPage / book.pages) * 100)
+      : 0;
 
-    return (
-        <div className="min-h-screen bg-background text-foreground">
-            <Header />
-            <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <ArrowLeft className="size-4" />
-                    Voltar para a Biblioteca
-                </Link>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Coluna da Esquerda (Capa e Ações) */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <Card className="p-4 flex flex-col items-center gap-4">
-                            <div className="relative w-[150px] h-[220px] overflow-hidden rounded-md shadow-lg">
-                                <Image
-                                    src={cover || '/bookoru-capa.jpeg'}
-                                    alt={`Capa de ${title}`}
-                                    fill
-                                    sizes="150px"
-                                    className="object-cover"
-                                />
-                            </div>
-                            
-                            <div className="flex flex-col items-center text-center">
-                                <h1 className="font-serif text-2xl text-douro tracking-wide leading-tight">
-                                    {title}
-                                </h1>
-                                <p className="text-sm text-muted-foreground italic">
-                                    {author}
-                                </p>
-                            </div>
-
-                            {/* Avaliação */}
-                            {rating ? (
-                                <div className="flex items-center gap-1 text-3xl text-douro">
-                                    <span className="drop-shadow-glow">
-                                        {"👻".repeat(rating)}
-                                    </span>
-                                    <span className="ghost-faded">
-                                        {"👻".repeat(5 - rating)}
-                                    </span>
-                                </div>
-                            ) : null}
-                            
-                            <Separator className="w-full" />
-
-                            {/* Botões de Ação */}
-                            <div className="flex w-full gap-2">
-                                <Button asChild variant="secondary" className="w-full">
-                                    <Link href={`/books/${id}/edit`}>
-                                        <Pencil className="size-4" />
-                                        Editar
-                                    </Link>
-                                </Button>
-                                <DeleteBookDialog bookId={id} bookTitle={title} redirect={true} />
-                            </div>
-                        </Card>
-
-                        {/* Dados Secundários */}
-                        <Card>
-                            <CardContent className="space-y-3 pt-6">
-                                <div className="flex items-center gap-3">
-                                    <Clock className="size-4 text-muted-foreground" />
-                                    <p className="text-sm">
-                                        **Ano:** {year || 'N/A'}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <BookOpen className="size-4 text-muted-foreground" />
-                                    <p className="text-sm">
-                                        **Páginas Totais:** {pages || 'N/A'}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Hash className="size-4 text-muted-foreground" />
-                                    <p className="text-sm">
-                                        **ISBN:** {isbn || 'N/A'}
-                                    </p>
-                                </div>
-                                {genre?.name && (
-                                    <div className="flex items-center gap-3">
-                                        <NotebookPen className="size-4 text-muted-foreground" />
-                                        <p className="text-sm">
-                                            **Gênero:** <span className="bg-vinho text-white px-2 py-0.5 rounded-full text-xs">{genre.name}</span>
-                                        </p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Coluna da Direita (Detalhes e Notas) */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Status e Progresso */}
-                        <Card>
-                            <CardHeader className="border-b">
-                                <CardTitle className="font-serif text-lg text-douro">Status e Progresso</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4 pt-6">
-                                <p className="text-lg">
-                                    **Status Atual:** <span className="font-semibold text-primary">{status}</span>
-                                </p>
-
-                                {(pages && pages > 0) && (
-                                    <div className="space-y-1">
-                                        <p className="text-sm text-muted-foreground">
-                                            Progresso: {progress}% ({currentPage}/{pages} páginas)
-                                        </p>
-                                        <div className="w-full bg-secondary/20 rounded-full h-3">
-                                            <div className="bg-primary h-3 rounded-full" style={{ width: `${progress}%` }} />
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Sinopse */}
-                        <Card>
-                            <CardHeader className="border-b">
-                                <CardTitle className="font-serif text-lg text-douro">Sinopse</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-base text-muted-foreground pt-6">
-                                {synopsis || 'Nenhuma sinopse fornecida.'}
-                            </CardContent>
-                        </Card>
-
-                        {/* Notas Pessoais */}
-                        {notes && (
-                            <Card>
-                                <CardHeader className="border-b">
-                                    <CardTitle className="font-serif text-lg text-douro">Notas Pessoais</CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-base pt-6 whitespace-pre-wrap">
-                                    {notes}
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                </div>
-            </main>
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <Button asChild variant="outline">
+            <Link href="/">← Voltar para a Biblioteca</Link>
+          </Button>
         </div>
-    );
+
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="md:col-span-1">
+            <Image
+              src={book.cover}
+              alt={`Capa do livro ${book.title}`}
+              width={400}
+              height={600}
+              className="w-full h-auto object-cover rounded-lg shadow-lg"
+              priority
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <h1 className="font-serif text-4xl font-bold text-douro">
+              {book.title}
+            </h1>
+            <p className="text-xl text-muted-foreground mt-2">
+              {book.author}
+              {book.year ? `, ${book.year}` : ""}
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              {book.genre && (
+                <span className="text-sm font-semibold px-3 py-1 rounded-full bg-vinho text-white">
+                  {book.genre.name}
+                </span>
+              )}
+              {book.status && (
+                <span
+                  className={`text-sm font-semibold px-3 py-1 rounded-full border ${statusStyles[book.status] ?? ""}`}
+                >
+                  {book.status.replace("_", " ")}
+                </span>
+              )}
+            </div>
+
+            {book.rating ? (
+              <div className="flex items-center gap-1 mt-4 text-3xl text-douro">
+                {"👻".repeat(book.rating)}
+                <span className="ghost-faded">
+                  {"👻".repeat(5 - book.rating)}
+                </span>
+              </div>
+            ) : null}
+
+            <Separator className="my-6" />
+
+            <div className="space-y-4 text-sm">
+              {book.synopsis && <p>{book.synopsis}</p>}
+              {book.notes && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Minhas Anotações</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{book.notes}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {book.status === "LENDO" && progress > 0 && (
+              <div className="mt-6">
+                <Label>Progresso da Leitura</Label>
+                <div className="w-full bg-secondary/20 rounded-full h-2 mt-2">
+                  <div
+                    className="bg-primary h-2 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-right text-muted-foreground mt-1">
+                  {progress}% ({book.currentPage} de {book.pages} páginas)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }
