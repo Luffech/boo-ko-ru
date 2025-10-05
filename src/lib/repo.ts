@@ -1,7 +1,10 @@
-import type { Book, Genre } from "@prisma/client";
+import type { Book, Genre, Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export type AppBook = Book & { genre: Genre | null };
+
+export type CreateBookData = Prisma.BookUncheckedCreateInput;
+export type UpdateBookData = Prisma.BookUpdateInput;
 
 export const repo = {
   async listBooks(query = "", genreId = ""): Promise<AppBook[]> {
@@ -12,13 +15,13 @@ export const repo = {
       
       AND.push({
         OR: [
-          { title: { contains: q } },
-          { author: { contains: q } },
+          { title: { contains: q, mode: 'insensitive' } },
+          { author: { contains: q, mode: 'insensitive' } },
         ],
       });
     }
 
-    if (genreId) {
+    if (genreId && genreId !== 'all') {
       AND.push({ genreId });
     }
 
@@ -38,6 +41,23 @@ export const repo = {
     return prisma.book.findUnique({
       where: { id },
       include: { genre: true },
+    });
+  },
+  
+  async createBook(data: CreateBookData): Promise<Book> {
+    return prisma.book.create({ data });
+  },
+
+  async updateBook(id: string, data: UpdateBookData): Promise<Book> {
+    return prisma.book.update({
+      where: { id },
+      data,
+    });
+  },
+
+  async deleteBook(id: string): Promise<Book> {
+    return prisma.book.delete({
+        where: { id },
     });
   },
 };

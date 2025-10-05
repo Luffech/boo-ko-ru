@@ -1,3 +1,4 @@
+// luffech/bookoru-lite/bookoru-lite-2b235f414b9277d70c0c6607066f10fa74d4/src/components/ThemeToggle.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,8 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+  
+  // Exibe um botão desabilitado para evitar erro de hidratação (SSR vs CSR)
   if (!mounted) {
     return (
       <Button
@@ -33,9 +36,9 @@ export function ThemeToggle() {
       aria-label="Alternar tema claro/escuro"
       className="
         inline-flex items-center gap-2 rounded-full
-        px-5 py-2.5 text-base font-medium
-        shadow-md hover:shadow-lg
-        bg-muted hover:bg-accent
+        px-4 py-2 text-base font-medium
+        shadow-sm hover:shadow-md
+        bg-background hover:bg-muted/50
         border border-border
         transition-all
       "
@@ -46,7 +49,8 @@ export function ThemeToggle() {
         className="
           inline-flex items-center justify-center
           rounded-md px-1.5 py-0.5 text-sm
-          bg-accent text-accent-foreground
+          bg-douro/20 text-douro dark:text-douro
+          drop-shadow-glow
         "
       >
         {emoji}

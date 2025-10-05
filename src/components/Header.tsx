@@ -1,3 +1,4 @@
+// luffech/bookoru-lite/bookoru-lite-2b235f414b9277d70c0c6607066f10fa74d4/src/components/Header.tsx
 "use client";
 
 import Image from "next/image";
@@ -19,6 +20,7 @@ export function Header() {
             className="rounded-md"
             priority
           />
+          {/* Aplicando font-serif e a cor douro para o nome do projeto */}
           <span className="font-serif text-xl tracking-wide text-douro">Bookoru</span>
         </Link>
 

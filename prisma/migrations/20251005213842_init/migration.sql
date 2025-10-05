@@ -9,8 +9,8 @@ CREATE TABLE "Genre" (
 -- CreateTable
 CREATE TABLE "Book" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "author" TEXT NOT NULL,
+    "title" TEXT NOT NULL COLLATE NOCASE,
+    "author" TEXT NOT NULL COLLATE NOCASE,
     "cover" TEXT NOT NULL,
     "year" INTEGER,
     "pages" INTEGER,

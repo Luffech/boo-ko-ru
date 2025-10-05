@@ -8,8 +8,8 @@ import type { Genre } from "@prisma/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, BookOpen, Pencil, Trash } from "lucide-react";
+import { DeleteBookDialog } from "./DeleteBookDialog";
 
 export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
   const router = useRouter();
@@ -24,7 +24,7 @@ export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
       <div className="grid grid-cols-[110px_1fr] gap-4 p-4">
         <div className="relative w-[110px] h-[160px] overflow-hidden rounded-md">
           <Image
-            src={book.cover}
+            src={book.cover || '/bookoru-capa.jpeg'}
             alt={`Capa de ${book.title}`}
             fill
             sizes="110px"
@@ -35,7 +35,7 @@ export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
         <div className="flex flex-col gap-2">
           <CardHeader className="p-0">
             <div className="flex items-start justify-between gap-3">
-              <CardTitle className="font-serif text-lg leading-tight">
+              <CardTitle className="font-serif text-lg leading-tight text-foreground">
                 <Link href={`/books/${book.id}`} className="hover:underline">
                   {book.title}
                 </Link>
@@ -48,9 +48,28 @@ export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Editar</DropdownMenuItem>
-                  <DropdownMenuItem variant="destructive">
-                    Excluir
+                  
+                  <DropdownMenuItem asChild>
+                    <Link href={`/books/${book.id}`}>
+                      <BookOpen className="size-4" />
+                      Visualizar
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link href={`/books/${book.id}/edit`}>
+                        <Pencil className="size-4" />
+                        Editar
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()} asChild>
+                    <DeleteBookDialog bookId={book.id} bookTitle={book.title} >
+                      <button type="button" className="flex items-center gap-2">
+                        <Trash className="size-4" />
+                        Excluir
+                      </button>
+                    </DeleteBookDialog>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -71,7 +90,9 @@ export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
 
             {book.rating ? (
               <div className="mt-2 flex items-center gap-1 text-2xl text-douro">
-                {"👻".repeat(book.rating)}
+                <span className="drop-shadow-glow">
+                    {"👻".repeat(book.rating)}
+                </span>
                 <span className="ghost-faded">
                   {"👻".repeat(5 - (book.rating || 0))}
                 </span>

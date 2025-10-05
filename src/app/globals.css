@@ -1,3 +1,4 @@
+/* luffech/bookoru-lite/bookoru-lite-2b235f414b9277d70c0c6607066f10fa74d4/src/app/globals.css */
 @import "tailwindcss";
 
 @layer base {
@@ -24,6 +25,9 @@
     --douro: 39 51% 66%;
     --vinho: 295 36% 27%;
     --ambar: 42 81% 46%;
+
+    /* Ajuste do raio para seguir o padrão Shadcn/UI/Next.js */
+    --radius: 0.5rem;
   }
   .dark {
     --background: 220 26% 8%;
@@ -45,6 +49,9 @@
     --border: 220 26% 20%;
     --input: 220 26% 18%;
     --ring: 39 51% 66%;
+    --douro: 39 51% 66%;
+    --vinho: 295 36% 27%;
+    --ambar: 42 81% 46%;
   }
 }
 @theme {
@@ -74,16 +81,15 @@
 @layer base {
   * { @apply transition-colors duration-300 ease-in-out; }
   body {
-    @apply font-sans bg-no-repeat bg-center bg-fixed;
-    background-image: url('/logo_bookoru.png');
-    background-size: 50%;
+    @apply font-sans bg-background; /* Mudando o bg para variável do tema */
   }
   body { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
   h1, h2, h3 { font-family: var(--font-playfair), ui-serif, Georgia, serif; }
 }
 @layer utilities {
   .drop-shadow-glow {
-    filter: drop-shadow(0 0 6px #f4e3b2);
+    /* Usando a variável douro para o brilho dourado */
+    filter: drop-shadow(0 0 6px hsl(var(--douro))); 
   }
   .ghost-faded {
     opacity: 0.2;

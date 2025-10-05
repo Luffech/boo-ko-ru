@@ -1,3 +1,4 @@
+// luffech/bookoru-lite/bookoru-lite-2b235f414b9277d70c0c6607066f10fa74d4/tailwind.config.ts
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -56,6 +57,10 @@ const config = {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                // Adicionando cores personalizadas para Bookoru
+                douro: "hsl(var(--douro))",
+                vinho: "hsl(var(--vinho))",
+                ambar: "hsl(var(--ambar))",
             },
             borderRadius: {
                 lg: "var(--radius)",
