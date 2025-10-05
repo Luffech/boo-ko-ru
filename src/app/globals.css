@@ -1,26 +1,92 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 220 13% 97%;
+    --foreground: 220 26% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 26% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 26% 14%;
+    --primary: 220 26% 14%;
+    --primary-foreground: 39 51% 83%;
+    --secondary: 216 52% 24%;
+    --secondary-foreground: 220 13% 97%;
+    --muted: 220 13% 90%;
+    --muted-foreground: 220 9% 45%;
+    --accent: 39 51% 83%;
+    --accent-foreground: 220 26% 14%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 85%;
+    --input: 220 13% 90%;
+    --ring: 216 52% 24%;
+    --douro: 39 51% 66%;
+    --vinho: 295 36% 27%;
+    --ambar: 42 81% 46%;
+  }
+  .dark {
+    --background: 220 26% 8%;
+    --foreground: 220 13% 97%;
+    --card: 220 26% 12%;
+    --card-foreground: 220 13% 97%;
+    --popover: 220 26% 8%;
+    --popover-foreground: 220 13% 97%;
+    --primary: 220 13% 97%;
+    --primary-foreground: 39 51% 66%;
+    --secondary: 216 52% 34%;
+    --secondary-foreground: 220 13% 97%;
+    --muted: 220 26% 18%;
+    --muted-foreground: 220 9% 55%;
+    --accent: 39 51% 66%;
+    --accent-foreground: 220 26% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 26% 20%;
+    --input: 220 26% 18%;
+    --ring: 39 51% 66%;
   }
 }
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-douro: hsl(var(--douro));
+  --color-vinho: hsl(var(--vinho));
+  --color-ambar: hsl(var(--ambar));
+}
+@layer base {
+  * { @apply transition-colors duration-300 ease-in-out; }
+  body {
+    @apply font-sans bg-no-repeat bg-center bg-fixed;
+    background-image: url('/logo_bookoru.png');
+    background-size: 50%;
+  }
+  body { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+  h1, h2, h3 { font-family: var(--font-playfair), ui-serif, Georgia, serif; }
+}
+@layer utilities {
+  .drop-shadow-glow {
+    filter: drop-shadow(0 0 6px #f4e3b2);
+  }
+  .ghost-faded {
+    opacity: 0.2;
+    transition: opacity 0.2s ease-in-out;
+  }
 }
