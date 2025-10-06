@@ -83,6 +83,7 @@ export function BookForm({ genres, book }: BookFormProps) {
               fill
               sizes="100%"
               className="object-contain"
+              unoptimized
             />
           </div>
 
