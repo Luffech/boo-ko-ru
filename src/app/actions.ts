@@ -1,78 +1,73 @@
-import { z } from 'zod';
-import { repo } from '@/lib/repo';
-import { ReadingStatus } from '@prisma/client';
+// src/app/actions.ts
+"use server";
 
-const bookSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, 'O Título é obrigatório.'),
-  author: z.string().min(1, 'O Autor é obrigatório.'),
-  cover: z.string().url('Deve ser uma URL válida.').optional().or(z.literal('')),
-  year: z.coerce.number().int().min(1000).max(new Date().getFullYear()).optional().or(z.literal(0)),
-  pages: z.coerce.number().int().min(1).optional().or(z.literal(0)),
-  currentPage: z.coerce.number().int().min(0).optional().or(z.literal(0)),
-  rating: z.coerce.number().int().min(1).max(5).optional().or(z.literal(0)),
-  synopsis: z.string().optional(),
-  isbn: z.string().optional(),
-  notes: z.string().optional(),
-  status: z.nativeEnum(ReadingStatus).default(ReadingStatus.QUERO_LER),
-  genreId: z.string().optional().or(z.literal('')),
-});
+import { revalidatePath } from "next/cache";
+import { repo } from "@/lib/repo";
 
-const { revalidatePath } = require('next/cache');
-
+function s(v: FormDataEntryValue | null): string {
+  return typeof v === "string" ? v.trim() : "";
+}
+function n(v: FormDataEntryValue | null): number | null {
+  const str = s(v);
+  if (str === "") return null;
+  const num = Number(str);
+  return Number.isFinite(num) ? num : null;
+}
 
 export async function saveBook(formData: FormData) {
-  const data = Object.fromEntries(formData.entries());
+  // Campos vindos do form
+  const id = s(formData.get("id")) || undefined;
+  const title = s(formData.get("title"));
+  const author = s(formData.get("author")) || null;
+  const cover = s(formData.get("cover")) || null;
+  const synopsis = s(formData.get("synopsis")) || null;
+  const status = s(formData.get("status")) || null; // QUERO_LER/LENDO/LIDO/PAUSADO/ABANDONADO
+  const rawGenre = s(formData.get("genreId"));
+  const genreId = !rawGenre || rawGenre === "none" ? null : rawGenre;
 
-  const parsedData = {
-    ...data,
-    year: data.year ? parseInt(data.year as string, 10) : 0,
-    pages: data.pages ? parseInt(data.pages as string, 10) : 0,
-    currentPage: data.currentPage ? parseInt(data.currentPage as string, 10) : 0,
-    rating: data.rating ? parseInt(data.rating as string, 10) : 0,
-    genreId: data.genreId === 'none' || data.genreId === '' ? undefined : data.genreId,
-    cover: data.cover || '/bookoru-capa.jpeg',
-  };
+  const year = n(formData.get("year"));
+  const pages = n(formData.get("pages"));
+  const currentPage = n(formData.get("currentPage"));
+  const rating = n(formData.get("rating")); // 👻
+  const isbn = s(formData.get("isbn")) || null;
+  const notes = s(formData.get("notes")) || null;
 
-  const validation = bookSchema.safeParse(parsedData);
-
-  if (!validation.success) {
-    const errors = validation.error.flatten().fieldErrors;
-    console.error('Validation Error:', errors);
-    throw new Error('Erro de validação nos dados do livro.');
+  if (!title) {
+    return { success: false, message: "Título é obrigatório." };
   }
 
-  const { id, year, pages, currentPage, rating, ...validatedData } = validation.data;
-  
-  const finalData = {
-    ...validatedData,
-    year: year || undefined,
-    pages: pages || undefined,
-    currentPage: currentPage || undefined,
-    rating: rating || undefined,
+  const data = {
+    title,
+    author,
+    cover,
+    synopsis,
+    status,
+    genreId,
+    year: year ?? undefined,
+    pages: pages ?? undefined,
+    currentPage: currentPage ?? undefined,
+    rating: rating ?? undefined,
+    isbn,
+    notes,
   };
 
-  try {
-    const book = id
-      ? await repo.updateBook(id, finalData)
-      : await repo.createBook(finalData);
+  const book = id
+    ? await repo.updateBook(id, data)
+    : await repo.createBook(data);
 
-    revalidatePath('/');
-    revalidatePath(`/books/${book.id}`); 
-    return { success: true, message: `Livro "${book.title}" salvo com sucesso!` };
-  } catch (e) {
-    console.error(e);
-    return { success: false, message: 'Erro ao salvar o livro no banco de dados.' };
-  }
+  revalidatePath("/");
+  revalidatePath(`/books/${book.id}`);
+  revalidatePath(`/books/${book.id}/edit`);
+
+  return {
+    success: true,
+    id: book.id,
+    message: id ? "Livro atualizado com sucesso." : "Livro criado com sucesso.",
+  };
 }
 
 export async function deleteBook(id: string) {
-  try {
-    const book = await repo.deleteBook(id);
-    revalidatePath('/');
-    return { success: true, message: `Livro "${book.title}" excluído com sucesso.` };
-  } catch (e) {
-    console.error(e);
-    return { success: false, message: 'Erro ao excluir o livro.' };
-  }
+  await repo.deleteBook(id);
+  revalidatePath("/");
+  return { success: true, message: "Livro excluído com sucesso." };
 }

@@ -2,7 +2,6 @@
 import { repo } from "@/lib/repo";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookForm } from "@/components/BookForm";
 
@@ -33,7 +32,8 @@ export default async function BookEditPage({
           ← Voltar para Detalhes
         </Link>
         <div className="max-w-xl mx-auto">
-          <BookForm genres={genres} book={book} />
+          {/* Força remontagem ao trocar de livro */}
+          <BookForm key={book.id} genres={genres} book={book} />
         </div>
       </main>
     </div>

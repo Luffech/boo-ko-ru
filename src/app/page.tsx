@@ -1,26 +1,47 @@
 // src/app/page.tsx
 import { repo } from "@/lib/repo";
 import { Header } from "@/components/Header";
-import { BookForm } from "@/components/BookForm";
 import { Filters } from "@/components/Filters";
 import { StatsPanel } from "@/components/StatsPanel";
 import { BookList } from "@/components/BookList";
-import { Separator } from "@/components/ui/separator";
+
+type SearchParamsLike =
+  | Record<string, string | string[] | undefined>
+  | URLSearchParams;
+
+async function resolveSearchParams(spLike: any): Promise<SearchParamsLike> {
+  try {
+    if (spLike && typeof spLike.then === "function") {
+      return await spLike;
+    }
+    return spLike ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function readParam(sp: SearchParamsLike, key: string): string {
+  if (sp instanceof URLSearchParams) return sp.get(key) ?? "";
+  const v = (sp as Record<string, string | string[] | undefined>)[key];
+  if (typeof v === "string") return v;
+  if (Array.isArray(v)) return v[0] ?? "";
+  return "";
+}
 
 export default async function HomePage({
   searchParams,
 }: {
-  // Tipagem correta para Server Component
-  searchParams?: { query?: string; genre?: string };
+  searchParams: any;
 }) {
-  // Desestruturação imediata e segura para evitar o warning do Next.js
-  const { query: rawQuery, genre: rawGenre } = searchParams || {};
-  const query = rawQuery ?? "";
-  const genreId = rawGenre ?? "";
+  const sp = await resolveSearchParams(searchParams);
+  const queryRaw = readParam(sp, "query");
+  const genreRaw = readParam(sp, "genre");
+
+  const query = queryRaw || "";
+  const genreId = genreRaw === "all" ? "" : genreRaw; // :contentReference[oaicite:5]{index=5}
 
   const [books, genres] = await Promise.all([
-    // Assumindo que seu repo.ts foi corrigido para usar o modo 'insensitive'
-    repo.listBooks(query, genreId),
+    repo.listBooks({ query, genreId }),
     repo.listGenres(),
   ]);
 
@@ -29,18 +50,8 @@ export default async function HomePage({
       <Header />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <Filters genres={genres} />
-
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-6">
-            <StatsPanel books={books} />
-            <Separator />
-            <BookForm genres={genres} />
-          </div>
-
-          <div className="lg:col-span-2">
-            <BookList books={books} genres={genres} />
-          </div>
-        </section>
+        <StatsPanel books={books} />
+        <BookList books={books} genres={genres} />
       </main>
     </div>
   );
