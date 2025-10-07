@@ -1,59 +1,6 @@
-/* luffech/bookoru-lite/bookoru-lite-2b235f414b9277d70c0c6607066f10fa74d4/src/app/globals.css */
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 220 13% 97%;
-    --foreground: 220 26% 14%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 26% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 14%;
-    --primary: 220 26% 14%;
-    --primary-foreground: 39 51% 83%;
-    --secondary: 216 52% 24%;
-    --secondary-foreground: 220 13% 97%;
-    --muted: 220 13% 90%;
-    --muted-foreground: 220 9% 45%;
-    --accent: 39 51% 83%;
-    --accent-foreground: 220 26% 14%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 85%;
-    --input: 220 13% 90%;
-    --ring: 216 52% 24%;
-    --douro: 39 51% 66%;
-    --vinho: 295 36% 27%;
-    --ambar: 42 81% 46%;
-
-    /* Ajuste do raio para seguir o padrão Shadcn/UI/Next.js */
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 220 26% 8%;
-    --foreground: 220 13% 97%;
-    --card: 220 26% 12%;
-    --card-foreground: 220 13% 97%;
-    --popover: 220 26% 8%;
-    --popover-foreground: 220 13% 97%;
-    --primary: 220 13% 97%;
-    --primary-foreground: 39 51% 66%;
-    --secondary: 216 52% 34%;
-    --secondary-foreground: 220 13% 97%;
-    --muted: 220 26% 18%;
-    --muted-foreground: 220 9% 55%;
-    --accent: 39 51% 66%;
-    --accent-foreground: 220 26% 8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 26% 20%;
-    --input: 220 26% 18%;
-    --ring: 39 51% 66%;
-    --douro: 39 51% 66%;
-    --vinho: 295 36% 27%;
-    --ambar: 42 81% 46%;
-  }
-}
+/* Tokens de design usados pelos utilitários (Tailwind v4) */
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -74,25 +21,71 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --color-douro: hsl(var(--douro));
-  --color-vinho: hsl(var(--vinho));
-  --color-ambar: hsl(var(--ambar));
+  --radius: 0.75rem;
 }
+
+/* Valores HSL das variáveis (claro/escuro) */
 @layer base {
-  * { @apply transition-colors duration-300 ease-in-out; }
-  body {
-    @apply font-sans bg-background; /* Mudando o bg para variável do tema */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 207 100% 41%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 206 64% 51%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 210 67% 67%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --muted: 209 60% 92%;
+    --muted-foreground: 222 30% 26%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 207 44% 86%;
+    --input: 207 44% 86%;
+    --ring: 208 82% 40%;
+    accent-color: hsl(var(--primary));
   }
-  body { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
-  h1, h2, h3 { font-family: var(--font-playfair), ui-serif, Georgia, serif; }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 207 100% 41%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 206 64% 51%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 210 67% 67%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --muted: 222.2 47.4% 11.2%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 210 67% 67%;
+    accent-color: hsl(var(--primary));
+  }
 }
-@layer utilities {
-  .drop-shadow-glow {
-    /* Usando a variável douro para o brilho dourado */
-    filter: drop-shadow(0 0 6px hsl(var(--douro))); 
+
+/* Aplicação dos tokens */
+@layer base {
+  * {
+    @apply border-border;
   }
-  .ghost-faded {
-    opacity: 0.2;
-    transition: opacity 0.2s ease-in-out;
+  html, body, :root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.6);
   }
 }

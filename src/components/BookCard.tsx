@@ -1,117 +1,120 @@
+// src/components/BookCard.tsx
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { AppBook } from "@/lib/repo";
-import type { Genre } from "@prisma/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreVertical, BookOpen, Pencil, Trash } from "lucide-react";
-import { DeleteBookDialog } from "./DeleteBookDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { DeleteBookDialog } from "@/components/DeleteBookDialog";
 
-export function BookCard({ book, genres }: { book: AppBook; genres: Genre[] }) {
-  const router = useRouter();
+type Props = {
+  book: AppBook;
+};
 
-  const progress =
-    book.pages && book.currentPage
-      ? Math.round((book.currentPage / book.pages) * 100)
+export function BookCard({ book }: Props) {
+  const coverSrc = book.cover || "/bookoru-capa.jpeg";
+
+  const totalPages = typeof book.pages === "number" ? Math.max(0, book.pages) : 0;
+  const current =
+    typeof book.currentPage === "number"
+      ? Math.min(Math.max(0, book.currentPage), totalPages)
       : 0;
+  const progress = totalPages > 0 ? Math.round((current / totalPages) * 100) : 0;
 
   return (
-    <Card className="overflow-hidden">
-      <div className="grid grid-cols-[110px_1fr] gap-4 p-4">
-        <div className="relative w-[110px] h-[160px] overflow-hidden rounded-md">
-          <Image
-            src={book.cover || '/bookoru-capa.jpeg'}
-            alt={`Capa de ${book.title}`}
-            fill
-            sizes="110px"
-            className="object-cover"
-          />
-        </div>
+    <Card className="group relative overflow-hidden">
+      <CardContent className="p-4">
+        <div className="grid grid-cols-[96px_1fr_auto] gap-4 items-start">
+          <div className="relative h-28 w-20 overflow-hidden rounded-md border">
+            <Image
+              src={coverSrc}
+              alt={`Capa de ${book.title}`}
+              fill
+              sizes="80px"
+              className="object-cover"
+              priority={false}
+            />
+          </div>
 
-        <div className="flex flex-col gap-2">
-          <CardHeader className="p-0">
-            <div className="flex items-start justify-between gap-3">
-              <CardTitle className="font-serif text-lg leading-tight text-foreground">
-                <Link href={`/books/${book.id}`} className="hover:underline">
-                  {book.title}
-                </Link>
-              </CardTitle>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" aria-label="Ações">
-                    <MoreVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  
-                  <DropdownMenuItem asChild>
-                    <Link href={`/books/${book.id}`}>
-                      <BookOpen className="size-4" />
-                      Visualizar
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  <DropdownMenuItem asChild>
-                    <Link href={`/books/${book.id}/edit`}>
-                        <Pencil className="size-4" />
-                        Editar
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()} asChild>
-                    <DeleteBookDialog bookId={book.id} bookTitle={book.title} >
-                      <button type="button" className="flex items-center gap-2">
-                        <Trash className="size-4" />
-                        Excluir
-                      </button>
-                    </DeleteBookDialog>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
+          <div className="min-w-0">
+            <Link href={`/books/${book.id}`} className="block">
+              <h3 className="text-lg font-semibold line-clamp-2">{book.title}</h3>
+            </Link>
             <p className="text-sm text-muted-foreground">
-              {book.author || "Autor desconhecido"}
+              {book.author}
               {book.year ? `, ${book.year}` : ""}
             </p>
 
-            {book.genre?.name && (
-              <p className="text-xs mt-1 bg-vinho text-white inline-block px-2 py-0.5 rounded-full">
-                {book.genre.name}
-              </p>
-            )}
+            <div
+              className="mt-2 flex items-center gap-1 text-2xl text-douro"
+              aria-label={`Avaliação ${book.rating ?? 0} de 5`}
+            >
+              {Array.from({ length: 5 }).map((_, i) => {
+                const filled = (book.rating ?? 0) >= i + 1;
+                return (
+                  <span key={i} className={filled ? "drop-shadow-glow" : "ghost-faded"}>
+                    👻
+                  </span>
+                );
+              })}
+            </div>
 
-            {book.rating ? (
-              <div className="mt-2 flex items-center gap-1 text-2xl text-douro">
-                <span className="drop-shadow-glow">
-                    {"👻".repeat(book.rating)}
-                </span>
-                <span className="ghost-faded">
-                  {"👻".repeat(5 - (book.rating || 0))}
-                </span>
-              </div>
-            ) : null}
-
-            {progress > 0 && book.status === 'LENDO' && (
+            {totalPages > 0 && (
               <div className="mt-2">
                 <div className="w-full bg-secondary/20 rounded-full h-2">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: `${progress}%` }} />
+                  <div
+                    className="bg-primary h-2 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 text-right">
-                  {progress}% ({book.currentPage}/{book.pages})
+                  {progress}% ({current}/{totalPages})
                 </p>
               </div>
             )}
-          </CardContent>
+          </div>
+
+          <div className="flex items-start gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Ações">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-40">
+                <DropdownMenuItem asChild>
+                  <Link href={`/books/${book.id}`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Detalhes
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/books/${book.id}/edit`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Editar
+                  </Link>
+                </DropdownMenuItem>
+                <DeleteBookDialog id={book.id}>
+                  <DropdownMenuItem className="text-destructive focus:text-destructive">
+                    <Trash className="mr-2 h-4 w-4" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DeleteBookDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }
+
+export default BookCard;
