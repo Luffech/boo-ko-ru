@@ -1,14 +1,6 @@
 // prisma/schema.prisma
-generator client {
-  provider = "prisma-client-js"
-}
 
 generator client {
-  provider = "prisma-client-js"
-}
-
-
-enum ReadingStatus {generator client {
   provider = "prisma-client-js"
 }
 
@@ -26,44 +18,6 @@ enum ReadingStatus {
 }
 
 model Genre {
-  id    String  @id @default(cuid())
-  name  String  @unique
-  books Book[]
-
-  @@index([name])
-}
-
-model Book {
-  id          String         @id @default(cuid())
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  title       String
-  author      String
-  cover       String
-  year        Int?
-  pages       Int?
-  currentPage Int?
-  rating      Int?
-  synopsis    String?
-  isbn        String?
-  notes       String?
-  status      ReadingStatus?
-  genreId     String?
-  genre       Genre?         @relation(fields: [genreId], references: [id])
-
-  @@index([title])
-  @@index([author])
-  @@index([status])
-}
-
-  QUERO_LER
-  LENDO
-  LIDO
-  PAUSADO
-  ABANDONADO
-}
-
-model Genre {
   id        String   @id @default(cuid())
   name      String   @unique
   books     Book[]
@@ -72,7 +26,7 @@ model Genre {
 }
 
 model Book {
-  id          String         @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
   author      String
   cover       String
@@ -83,11 +37,11 @@ model Book {
   synopsis    String?
   isbn        String?
   notes       String?
-  status      ReadingStatus  @default(QUERO_LER)
+  status      ReadingStatus @default(QUERO_LER)
   genreId     String?
-  genre       Genre?         @relation(fields: [genreId], references: [id])
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  genre       Genre?        @relation(fields: [genreId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@index([title])
   @@index([author])
