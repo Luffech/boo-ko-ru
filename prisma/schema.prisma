@@ -3,13 +3,59 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client-js"
 }
 
 
+enum ReadingStatus {generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 enum ReadingStatus {
+  QUERO_LER
+  LENDO
+  LIDO
+  PAUSADO
+  ABANDONADO
+}
+
+model Genre {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  books Book[]
+
+  @@index([name])
+}
+
+model Book {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  title       String
+  author      String
+  cover       String
+  year        Int?
+  pages       Int?
+  currentPage Int?
+  rating      Int?
+  synopsis    String?
+  isbn        String?
+  notes       String?
+  status      ReadingStatus?
+  genreId     String?
+  genre       Genre?         @relation(fields: [genreId], references: [id])
+
+  @@index([title])
+  @@index([author])
+  @@index([status])
+}
+
   QUERO_LER
   LENDO
   LIDO
