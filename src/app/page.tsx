@@ -46,7 +46,7 @@ export default async function Page({
       <Header />
       <Filters initialQuery={query} initialGenre={genre} genres={genres} />
       <StatsPanel books={books} />
-      <BookList books={books} />
+      <BookList books={books} genres={genres} />
     </main>
   );
 }
