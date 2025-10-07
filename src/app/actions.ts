@@ -3,7 +3,7 @@
 
 import { revalidatePath } from "next/cache";
 import { repo } from "@/lib/repo";
-import { Prisma } from "@prisma/client";
+import { Prisma, ReadingStatus } from "@prisma/client";
 
 function s(v: FormDataEntryValue | null): string {
   return typeof v === "string" ? v.trim() : "";
@@ -16,13 +16,7 @@ function n(v: FormDataEntryValue | null): number | null {
 }
 
 const DEFAULT_COVER = "/bookoru-capa.jpeg";
-const ALLOWED_STATUS: Prisma.ReadingStatus[] = [
-  "QUERO_LER",
-  "LENDO",
-  "LIDO",
-  "PAUSADO",
-  "ABANDONADO",
-];
+const ALLOWED_STATUS = ["QUERO_LER", "LENDO", "LIDO", "PAUSADO", "ABANDONADO"] as const;
 
 export async function saveBook(formData: FormData) {
   const id = s(formData.get("id")) || undefined;
@@ -32,8 +26,8 @@ export async function saveBook(formData: FormData) {
   const synopsis = s(formData.get("synopsis")) || null;
 
   const rawStatus = s(formData.get("status"));
-  const status = (ALLOWED_STATUS as unknown as string[]).includes(rawStatus)
-    ? (rawStatus as Prisma.ReadingStatus)
+  const status = (ALLOWED_STATUS as readonly string[]).includes(rawStatus)
+    ? (rawStatus as ReadingStatus)
     : null;
 
   const rawGenre = s(formData.get("genreId"));
@@ -115,4 +109,3 @@ export async function deleteBook(id: string) {
     return { success: false, message: "Erro ao excluir livro." };
   }
 }
-  

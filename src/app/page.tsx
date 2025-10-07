@@ -1,8 +1,8 @@
 // src/app/page.tsx
-import Header from "@/components/Header";
-import Filters from "@/components/Filters";
-import StatsPanel from "@/components/StatsPanel";
-import BookList from "@/components/BookList";
+import { Header } from "@/components/Header";
+import { Filters } from "@/components/Filters";
+import { StatsPanel } from "@/components/StatsPanel";
+import { BookList } from "@/components/BookList";
 import { repo } from "@/lib/repo";
 
 type SearchParams = Promise<{
