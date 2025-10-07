@@ -1,6 +1,6 @@
+/* src/app/globals.css */
 @import "tailwindcss";
 
-/* Tokens de design usados pelos utilitários (Tailwind v4) */
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -21,10 +21,9 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --radius: 0.75rem;
+  --color-douro: hsl(var(--douro));
 }
 
-/* Valores HSL das variáveis (claro/escuro) */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -46,6 +45,7 @@
     --border: 207 44% 86%;
     --input: 207 44% 86%;
     --ring: 208 82% 40%;
+    --douro: 39 51% 66%;
     accent-color: hsl(var(--primary));
   }
 
@@ -69,23 +69,19 @@
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
     --ring: 210 67% 67%;
+    --douro: 39 51% 66%;
     accent-color: hsl(var(--primary));
   }
 }
 
-/* Aplicação dos tokens */
 @layer base {
-  * {
-    @apply border-border;
-  }
-  html, body, :root {
-    height: 100%;
-  }
-  body {
-    @apply bg-background text-foreground antialiased;
-  }
-  :focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.6);
-  }
+  * { @apply border-border; }
+  html, body, :root { height: 100%; }
+  body { @apply bg-background text-foreground antialiased; }
+  :focus-visible { outline: none; box-shadow: 0 0 0 2px hsl(var(--ring) / 0.6); }
+}
+
+@layer utilities {
+  .drop-shadow-glow { filter: drop-shadow(0 0 6px hsl(var(--douro))); }
+  .ghost-faded { opacity: .25; transition: opacity .2s ease-in-out; }
 }

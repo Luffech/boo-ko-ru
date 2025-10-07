@@ -15,9 +15,7 @@ import {
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { DeleteBookDialog } from "@/components/DeleteBookDialog";
 
-type Props = {
-  book: AppBook;
-};
+type Props = { book: AppBook };
 
 export function BookCard({ book }: Props) {
   const coverSrc = book.cover || "/bookoru-capa.jpeg";
