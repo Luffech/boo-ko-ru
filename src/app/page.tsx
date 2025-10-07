@@ -1,44 +1,40 @@
 // src/app/page.tsx
+import Header from "@/components/Header";
+import Filters from "@/components/Filters";
+import StatsPanel from "@/components/StatsPanel";
+import BookList from "@/components/BookList";
 import { repo } from "@/lib/repo";
-import { Header } from "@/components/Header";
-import { Filters } from "@/components/Filters";
-import { StatsPanel } from "@/components/StatsPanel";
-import { BookList } from "@/components/BookList";
 
-type SearchParamsLike =
-  | Record<string, string | string[] | undefined>
-  | URLSearchParams;
+type SearchParams = Promise<{
+  query?: string | string[] | undefined;
+  genre?: string | string[] | undefined;
+}>;
 
-async function resolveSearchParams(spLike: any): Promise<SearchParamsLike> {
-  try {
-    if (spLike && typeof spLike.then === "function") {
-      return await spLike;
-    }
-    return spLike ?? {};
-  } catch {
-    return {};
-  }
-}
-
-function readParam(sp: SearchParamsLike, key: string): string {
-  if (sp instanceof URLSearchParams) return sp.get(key) ?? "";
-  const v = (sp as Record<string, string | string[] | undefined>)[key];
-  if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v[0] ?? "";
-  return "";
-}
-
-export default async function HomePage({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: any;
+  searchParams: SearchParams;
 }) {
-  const sp = await resolveSearchParams(searchParams);
-  const queryRaw = readParam(sp, "query");
-  const genreRaw = readParam(sp, "genre");
+  const params = await searchParams;
 
-  const query = queryRaw || "";
-  const genreId = genreRaw === "all" ? "" : genreRaw; // :contentReference[oaicite:5]{index=5}
+  const rawQuery = params?.query;
+  const rawGenre = params?.genre;
+
+  const query =
+    typeof rawQuery === "string"
+      ? rawQuery
+      : Array.isArray(rawQuery)
+      ? rawQuery[0] ?? ""
+      : "";
+
+  const genre =
+    typeof rawGenre === "string"
+      ? rawGenre
+      : Array.isArray(rawGenre)
+      ? rawGenre[0] ?? "all"
+      : "all";
+
+  const genreId = genre === "all" ? "" : genre;
 
   const [books, genres] = await Promise.all([
     repo.listBooks({ query, genreId }),
@@ -46,13 +42,11 @@ export default async function HomePage({
   ]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main className="container mx-auto px-4 py-6">
       <Header />
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <Filters genres={genres} />
-        <StatsPanel books={books} />
-        <BookList books={books} genres={genres} />
-      </main>
-    </div>
+      <Filters initialQuery={query} initialGenre={genre} genres={genres} />
+      <StatsPanel books={books} />
+      <BookList books={books} />
+    </main>
   );
 }

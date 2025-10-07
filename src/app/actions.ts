@@ -25,7 +25,6 @@ const ALLOWED_STATUS: Prisma.ReadingStatus[] = [
 ];
 
 export async function saveBook(formData: FormData) {
-  // campos
   const id = s(formData.get("id")) || undefined;
   const title = s(formData.get("title"));
   const author = s(formData.get("author"));
@@ -33,7 +32,9 @@ export async function saveBook(formData: FormData) {
   const synopsis = s(formData.get("synopsis")) || null;
 
   const rawStatus = s(formData.get("status"));
-  const status = (ALLOWED_STATUS as string[]).includes(rawStatus) ? (rawStatus as Prisma.ReadingStatus) : null;
+  const status = (ALLOWED_STATUS as unknown as string[]).includes(rawStatus)
+    ? (rawStatus as Prisma.ReadingStatus)
+    : null;
 
   const rawGenre = s(formData.get("genreId"));
   const genreId = !rawGenre || rawGenre === "none" ? null : rawGenre;
@@ -41,18 +42,15 @@ export async function saveBook(formData: FormData) {
   const year = n(formData.get("year"));
   const pages = n(formData.get("pages"));
   const currentPage = n(formData.get("currentPage"));
-  let rating = n(formData.get("rating")); // 1..5 ou null
+  let rating = n(formData.get("rating"));
   const isbn = s(formData.get("isbn")) || null;
   const notes = s(formData.get("notes")) || null;
 
-  // validações mínimas (BD exige title/author/cover NOT NULL)
   if (!title) return { success: false, message: "Título é obrigatório." };
   if (!author) return { success: false, message: "Autor é obrigatório." };
 
-  // cover nunca pode ser nulo: aplica default no servidor
   const cover = rawCover || DEFAULT_COVER;
 
-  // números
   if (year != null && (year < 0 || year > new Date().getFullYear())) {
     return { success: false, message: "Ano inválido." };
   }
@@ -99,14 +97,11 @@ export async function saveBook(formData: FormData) {
       message: id ? "Livro atualizado com sucesso." : "Livro criado com sucesso.",
     };
   } catch (err: unknown) {
-    // mensagens mais claras para erros comuns
-    if (err && typeof err === "object" && "code" in (err as any)) {
-      const code = (err as any).code as string;
-      if (code === "P2002") {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
         return { success: false, message: "Violação de unicidade. Já existe um registro com esses dados." };
       }
     }
-    console.error(err);
     return { success: false, message: "Erro ao salvar livro." };
   }
 }
@@ -116,8 +111,8 @@ export async function deleteBook(id: string) {
     await repo.deleteBook(id);
     revalidatePath("/");
     return { success: true, message: "Livro excluído com sucesso." };
-  } catch (err) {
-    console.error(err);
+  } catch {
     return { success: false, message: "Erro ao excluir livro." };
   }
 }
+  
