@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Label } from "@/components/ui/label";
 
 interface BookDetailsPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const statusStyles: Record<string, string> = {
@@ -22,10 +22,9 @@ const statusStyles: Record<string, string> = {
 };
 
 export default async function BookDetailsPage({ params }: BookDetailsPageProps) {
-  // Desestruturação imediata para evitar o warning
-  const { id } = params;
+  const { id } = await params; // ✅ agora está aguardando params
+
   const book = await repo.getBook(id);
-  
   if (!book) notFound();
 
   const progress =

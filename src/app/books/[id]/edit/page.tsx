@@ -5,12 +5,10 @@ import { Header } from "@/components/Header";
 import Link from "next/link";
 import { BookForm } from "@/components/BookForm";
 
-export default async function BookEditPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+export default async function BookEditPage(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
   const [book, genres] = await Promise.all([
     repo.getBook(id),
@@ -32,7 +30,7 @@ export default async function BookEditPage({
           ← Voltar para Detalhes
         </Link>
         <div className="max-w-xl mx-auto">
-          {/* Força remontagem ao trocar de livro */}
+
           <BookForm key={book.id} genres={genres} book={book} />
         </div>
       </main>
