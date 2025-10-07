@@ -1,5 +1,3 @@
----
-
 # 📚 BookShelf
 
 ## 📖 Visão Geral
@@ -26,23 +24,51 @@ Este projeto foi desenvolvido com **Next.js** e segue as boas práticas mais rec
 
 Este é um projeto [Next.js](https://nextjs.org) criado com [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-### ▶️ Iniciando o Servidor de Desenvolvimento
+### ▶️ Passo a passo para configurar o ambiente
 
-Execute o comando:
+Siga as etapas abaixo para preparar o projeto localmente:
 
-```bash
-npm run dev
-# ou
-yarn dev
-# ou
-pnpm dev
-# ou
-bun dev
-```
+1. **Instale as dependências:**
 
-Abra o navegador em [http://localhost:3000](http://localhost:3000) para visualizar o resultado.
+   ```bash
+   npm install
+   ```
+
+2. **Crie o arquivo `.env` na raiz do projeto.**
+
+3. **Adicione a variável de ambiente do banco de dados:**
+
+   ```bash
+   DATABASE_URL="file:./dev.db"
+   ```
+
+4. **Execute a migração inicial do banco de dados com o Prisma:**
+
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+5. **Gere o cliente Prisma:**
+
+   ```bash
+   npx prisma generate
+   ```
+
+6. **Inicie o servidor de desenvolvimento:**
+
+   ```bash
+   npm run dev
+   # ou
+   yarn dev
+   # ou
+   pnpm dev
+   # ou
+   bun dev
+   ```
+
+7. **Abra o navegador em [http://localhost:3000](http://localhost:3000)** para visualizar o resultado.
+
 As alterações feitas em `app/page.tsx` serão refletidas automaticamente.
-
 Este projeto utiliza [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) para otimizar e carregar a fonte [Geist](https://vercel.com/font), da Vercel.
 
 ---
