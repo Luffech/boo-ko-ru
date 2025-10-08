@@ -1,11 +1,9 @@
-// src/components/BookList.tsx
 "use client";
 
 import type { AppBook } from "@/lib/repo";
-import type { Genre } from "@prisma/client";
 import { BookCard } from "./BookCard";
 
-export function BookList({ books, genres }: { books: AppBook[]; genres: Genre[] }) {
+export function BookList({ books }: { books: AppBook[] }) {
   if (!books?.length) {
     return (
       <p className="text-sm text-muted-foreground">

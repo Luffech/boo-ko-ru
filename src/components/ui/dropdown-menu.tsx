@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
-import { Slot } from "@radix-ui/react-slot" // <--- Importação adicionada
+import { Slot } from "@radix-ui/react-slot"
 
 import { cn } from "@/lib/utils"
 
@@ -65,13 +65,22 @@ function DropdownMenuItem({
   inset,
   variant = "default",
   asChild,
+  onSelect, // Extraído para tratamento específico
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean
   variant?: "default" | "destructive"
   asChild?: boolean
+  onSelect?: (event: Event) => void // Mantido como Event para compatibilidade com Radix
 }) {
   const Comp = asChild ? Slot : DropdownMenuPrimitive.Item
+
+  // Handler para converter SyntheticEvent para Event se necessário
+  const handleSelect = React.useCallback((event: Event) => {
+    if (onSelect) {
+      onSelect(event)
+    }
+  }, [onSelect])
 
   return (
     <Comp
@@ -82,6 +91,7 @@ function DropdownMenuItem({
         "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
+      onSelect={onSelect} // Mantém o onSelect original
       {...props}
     />
   )
