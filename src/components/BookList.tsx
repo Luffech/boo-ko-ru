@@ -17,7 +17,7 @@ export function BookList({ books, genres }: { books: AppBook[]; genres: Genre[] 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {books.map((book) => (
-        <BookCard key={book.id} book={book} genres={genres} />
+        <BookCard key={book.id} book={book} />
       ))}
     </div>
   );
